@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Web Application</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <audio id="trashSound" preload="auto">
+      <source src="assets/trash.mp3" type="audio/mpeg" />
+    </audio>
+    <div class="theme-switch">
+      <button
+        id="themeToggle"
+        class="theme-btn"
+        title="Toggle theme"
+        onclick="toggleTheme()"
+      >
+        <span class="light-icon">🌞</span>
+        <span class="dark-icon">🌙</span>
+      </button>
+    </div>
+
+    <div class="stats-actions">
+      <button
+        id="resetStatsBtn"
+        class="reset-stats-btn"
+        onclick="resetAllStats()"
+        title="Reset All Data"
+      >
+        ⟳
+      </button>
+    </div>
+
+    <div class="container">
+      <h1>DAY TRACKER V1.0</h1>
+
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('todo')">
+          Tasks
+        </button>
+        <button class="tab-btn" onclick="switchTab('timer')">Timer</button>
+        <button class="tab-btn" onclick="switchTab('data')">Statistics</button>
+      </div>
+
+      <div id="todo" class="tab-content active">
+        <div class="motivational-quote">
+          <p id="motivationalQuote"></p>
+        </div>
+        <div class="form-container">
+          <div class="input-group">
+            <input type="text" id="taskInput" placeholder="Add a new task..." />
+            <div class="priority-selector">
+              <button
+                class="priority-btn priority-high"
+                data-priority="high"
+                title="High Priority"
+              >
+                H
+              </button>
+              <button
+                class="priority-btn priority-medium active"
+                data-priority="medium"
+                title="Medium Priority"
+              >
+                M
+              </button>
+              <button
+                class="priority-btn priority-low"
+                data-priority="low"
+                title="Low Priority"
+              >
+                L
+              </button>
+            </div>
+          </div>
+          <div class="note-container">
+            <button
+              id="toggleNoteBtn"
+              class="toggle-note-btn"
+              onclick="toggleNoteInput()"
+            >
+              📝 Add Note
+            </button>
+            <textarea
+              id="taskNote"
+              style="display: none"
+              placeholder="Add notes (optional)&#10;Shift+Enter to add task"
+            ></textarea>
+          </div>
+          <button onclick="addTask()">Add Task</button>
+        </div>
+        <ul id="taskList">
+          <!-- Tasks will be added here -->
+        </ul>
+      </div>
+
+      <div id="data" class="tab-content">
+        <div class="data-container">
+          <div class="data-header">
+            <h2>Task Statistics</h2>
+            <div class="date-filter">
+              <button class="filter-btn active" onclick="filterStats('today')">
+                Today
+              </button>
+              <button class="filter-btn" onclick="filterStats('week')">
+                This Week
+              </button>
+              <button class="filter-btn" onclick="filterStats('month')">
+                This Month
+              </button>
+            </div>
+          </div>
+
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon">📊</div>
+              <span class="stat-label">Total Tasks</span>
+              <span class="stat-value" id="totalTasks">0</span>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">✅</div>
+              <span class="stat-label">Completed</span>
+              <span class="stat-value" id="completedTasks">0</span>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">⏳</div>
+              <span class="stat-label">Pending</span>
+              <span class="stat-value" id="pendingTasks">0</span>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">⚡</div>
+              <span class="stat-label">Efficiency</span>
+              <span class="stat-value" id="efficiency">0%</span>
+            </div>
+          </div>
+
+          <div class="priority-stats">
+            <h3>Priority Distribution</h3>
+            <div class="priority-bars">
+              <div class="priority-bar">
+                <span class="priority-label">High</span>
+                <div class="bar-container">
+                  <div class="bar high" id="highPriorityBar"></div>
+                </div>
+                <span class="priority-count" id="highPriorityCount">0</span>
+              </div>
+              <div class="priority-bar">
+                <span class="priority-label">Medium</span>
+                <div class="bar-container">
+                  <div class="bar medium" id="mediumPriorityBar"></div>
+                </div>
+                <span class="priority-count" id="mediumPriorityCount">0</span>
+              </div>
+              <div class="priority-bar">
+                <span class="priority-label">Low</span>
+                <div class="bar-container">
+                  <div class="bar low" id="lowPriorityBar"></div>
+                </div>
+                <span class="priority-count" id="lowPriorityCount">0</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="time-stats">
+            <h3>Time Statistics</h3>
+            <div class="time-stats-grid">
+              <div class="stat-card">
+                <div class="stat-icon">⏱️</div>
+                <span class="stat-label">Total Work Time</span>
+                <span class="stat-value" id="totalWorkTime">0 min</span>
+              </div>
+              <div class="stat-card">
+                <div class="stat-icon">⚡</div>
+                <span class="stat-label">Average Task Time</span>
+                <span class="stat-value" id="avgTaskTime">0 min</span>
+              </div>
+            </div>
+            <div class="task-time-list">
+              <h4>Task Times</h4>
+              <div id="taskTimeList" class="task-time-items">
+                <!-- Task times will be added here -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="timer" class="tab-content">
+        <div class="timer-container">
+          <div class="timer-setup">
+            <div class="task-options" id="taskSetupOptions">
+              <div class="task-option">
+                <h4>Select Task</h4>
+                <select id="timerTaskSelect" class="timer-task-select">
+                  <option value="">Select a task</option>
+                </select>
+              </div>
+
+              <div class="option-divider">or</div>
+
+              <div class="task-option">
+                <h4>Add New Task</h4>
+                <input
+                  type="text"
+                  id="newTimerTask"
+                  class="timer-task-input"
+                  placeholder="New task name"
+                />
+                <div class="priority-selector timer-priority">
+                  <button
+                    class="priority-btn priority-high"
+                    data-priority="high"
+                    title="High Priority"
+                  >
+                    !
+                  </button>
+                  <button
+                    class="priority-btn priority-medium active"
+                    data-priority="medium"
+                    title="Medium Priority"
+                  >
+                    ~
+                  </button>
+                  <button
+                    class="priority-btn priority-low"
+                    data-priority="low"
+                    title="Low Priority"
+                  >
+                    -
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="active-task" id="activeTask" style="display: none">
+              <h3>Active Task</h3>
+              <div class="active-task-name"></div>
+            </div>
+
+            <div class="time-inputs">
+              <input
+                type="number"
+                id="timerMinutes"
+                min="0"
+                max="180"
+                value="25"
+                class="timer-input"
+              />
+              <span class="timer-separator">:</span>
+              <input
+                type="number"
+                id="timerSeconds"
+                min="0"
+                max="59"
+                value="00"
+                class="timer-input"
+              />
+            </div>
+            <button id="startTimer" class="timer-btn">Start</button>
+          </div>
+
+          <div class="timer-display">
+            <div class="hourglass-container">
+              <div class="hourglass">
+                <div class="top-sand"></div>
+                <div class="bottom-sand"></div>
+              </div>
+            </div>
+            <div class="time-left">25:00</div>
+            <button
+              id="pauseTimer"
+              class="timer-control-btn"
+              style="display: none"
+            >
+              <span class="pause-icon">⏸</span>
+            </button>
+            <button
+              id="resetTimer"
+              class="timer-control-btn"
+              style="display: none"
+            >
+              <span class="reset-icon">⟳</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="script.js"></script>
+  </body>
+</html>
